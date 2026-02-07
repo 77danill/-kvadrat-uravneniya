@@ -1,0 +1,445 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор Квадратных Уравнений</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+        }
+        .math-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+        .input-glow:focus {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+        }
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid #6366f1;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .fraction-line {
+            width: 100%;
+            height: 1px;
+            background: currentColor;
+            margin: 2px 0;
+        }
+        /* Floating Telegram Button */
+        .telegram-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .telegram-float:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        .telegram-btn {
+            background: linear-gradient(135deg, #0088cc 0%, #00aaff 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0, 136, 204, 0.4);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .telegram-btn:hover {
+            box-shadow: 0 15px 40px rgba(0, 136, 204, 0.6);
+        }
+        .telegram-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <!-- Floating Telegram Support Button -->
+    <div class="telegram-float">
+        <a href="https://t.me/ilovechicolachowski" target="_blank" class="telegram-btn">
+            <svg class="telegram-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+            <span>Поддержка</span>
+        </a>
+    </div>
+
+    <div class="w-full max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Квадратные</span> Уравнения
+            </h1>
+            <p class="text-gray-400 text-lg">Решение, дискриминант и разложение на множители</p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="glass-panel rounded-2xl p-6 md:p-8 mb-6">
+            <div class="flex flex-col items-center gap-6">
+                <div class="text-2xl md:text-3xl text-white math-font flex items-center gap-2 flex-wrap justify-center">
+                    <input type="number" id="a" placeholder="a" 
+                        class="w-20 md:w-24 bg-gray-800/50 border border-gray-600 rounded-lg px-3 py-2 text-center text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 input-glow transition-all math-font text-xl"
+                        step="any" value="1">
+                    <span class="text-gray-300">x²</span>
+                    
+                    <select id="sign1" class="bg-gray-800/50 border border-gray-600 rounded-lg px-2 py-2 text-white focus:outline-none focus:border-indigo-500 math-font">
+                        <option value="+">+</option>
+                        <option value="-">−</option>
+                    </select>
+                    
+                    <input type="number" id="b" placeholder="b" 
+                        class="w-20 md:w-24 bg-gray-800/50 border border-gray-600 rounded-lg px-3 py-2 text-center text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 input-glow transition-all math-font text-xl"
+                        step="any" value="0">
+                    <span class="text-gray-300">x</span>
+                    
+                    <select id="sign2" class="bg-gray-800/50 border border-gray-600 rounded-lg px-2 py-2 text-white focus:outline-none focus:border-indigo-500 math-font">
+                        <option value="+">+</option>
+                        <option value="-">−</option>
+                    </select>
+                    
+                    <input type="number" id="c" placeholder="c" 
+                        class="w-20 md:w-24 bg-gray-800/50 border border-gray-600 rounded-lg px-3 py-2 text-center text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 input-glow transition-all math-font text-xl"
+                        step="any" value="0">
+                    <span class="text-gray-300">= 0</span>
+                </div>
+
+                <button onclick="solveEquation()" 
+                    class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-xl transition-all transform hover:scale-105 neon-glow text-lg">
+                    Решить уравнение
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden space-y-4">
+            
+            <!-- Equation Display -->
+            <div class="glass-panel rounded-2xl p-6 animate-slide-in">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider mb-2">Уравнение</h3>
+                <div id="equationDisplay" class="text-2xl md:text-3xl text-white math-font text-center"></div>
+            </div>
+
+            <!-- Discriminant -->
+            <div class="glass-panel rounded-2xl p-6 animate-slide-in" style="animation-delay: 0.1s">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider mb-3">Дискриминант</h3>
+                <div class="step-card rounded-lg p-4 mb-3">
+                    <div class="text-gray-300 math-font mb-2">D = b² − 4ac</div>
+                    <div id="discriminantCalc" class="text-white math-font"></div>
+                </div>
+                <div id="discriminantResult" class="text-xl font-bold"></div>
+            </div>
+
+            <!-- Roots -->
+            <div class="glass-panel rounded-2xl p-6 animate-slide-in" style="animation-delay: 0.2s">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider mb-3">Корни уравнения</h3>
+                <div id="rootsSection" class="space-y-3"></div>
+            </div>
+
+            <!-- Factorization -->
+            <div class="glass-panel rounded-2xl p-6 animate-slide-in" style="animation-delay: 0.3s">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider mb-3">Разложение на множители</h3>
+                <div id="factorization" class="text-xl md:text-2xl text-white math-font text-center p-4 bg-gray-800/30 rounded-xl"></div>
+            </div>
+
+            <!-- Vieta's Formulas -->
+            <div class="glass-panel rounded-2xl p-6 animate-slide-in" style="animation-delay: 0.4s">
+                <h3 class="text-gray-400 text-sm uppercase tracking-wider mb-3">Теорема Виета</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="step-card rounded-lg p-3">
+                        <div class="text-gray-400 text-sm">x₁ + x₂ = −b/a</div>
+                        <div id="vieta1" class="text-white math-font mt-1"></div>
+                    </div>
+                    <div class="step-card rounded-lg p-3">
+                        <div class="text-gray-400 text-sm">x₁ · x₂ = c/a</div>
+                        <div id="vieta2" class="text-white math-font mt-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error" class="hidden glass-panel rounded-2xl p-6 border-red-500/50 border">
+            <div class="text-red-400 text-center text-lg font-semibold"></div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            if (Number.isInteger(num)) return num.toString();
+            return num.toFixed(4).replace(/\.?0+$/, '');
+        }
+
+        function formatCoefficient(num, isFirst = false) {
+            if (num === 0) return '0';
+            if (num === 1 && !isFirst) return '';
+            if (num === -1 && !isFirst) return '−';
+            return formatNumber(num);
+        }
+
+        function getSign(value) {
+            return value >= 0 ? '+' : '−';
+        }
+
+        function absValue(value) {
+            return Math.abs(value);
+        }
+
+        function solveEquation() {
+            // Get values
+            let a = parseFloat(document.getElementById('a').value) || 0;
+            let b = parseFloat(document.getElementById('b').value) || 0;
+            let c = parseFloat(document.getElementById('c').value) || 0;
+            
+            // Apply signs from selects
+            const sign1 = document.getElementById('sign1').value;
+            const sign2 = document.getElementById('sign2').value;
+            
+            if (sign1 === '-') b = -b;
+            if (sign2 === '-') c = -c;
+
+            // Validation
+            if (a === 0) {
+                showError('Коэффициент a не может быть равен 0 (это не квадратное уравнение)');
+                return;
+            }
+
+            hideError();
+            document.getElementById('results').classList.remove('hidden');
+
+            // Display equation
+            displayEquation(a, b, c);
+
+            // Calculate discriminant
+            const D = b * b - 4 * a * c;
+            displayDiscriminant(a, b, c, D);
+
+            // Calculate roots
+            const roots = calculateRoots(a, b, D);
+            displayRoots(a, b, D, roots);
+
+            // Factorization
+            displayFactorization(a, roots);
+
+            // Vieta's formulas
+            displayVieta(a, b, c, roots);
+        }
+
+        function displayEquation(a, b, c) {
+            let html = '';
+            
+            // ax²
+            if (a === 1) html += 'x²';
+            else if (a === -1) html += '−x²';
+            else html += formatNumber(a) + 'x²';
+
+            // bx
+            if (b !== 0) {
+                if (b > 0) html += ' + ';
+                else html += ' − ';
+                if (Math.abs(b) !== 1) html += formatNumber(Math.abs(b));
+                html += 'x';
+            }
+
+            // c
+            if (c !== 0) {
+                if (c > 0) html += ' + ';
+                else html += ' − ';
+                html += formatNumber(Math.abs(c));
+            }
+
+            html += ' = 0';
+            document.getElementById('equationDisplay').innerHTML = html;
+        }
+
+        function displayDiscriminant(a, b, c, D) {
+            const calc = `D = (${formatNumber(b)})² − 4·(${formatNumber(a)})·(${formatNumber(c)}) = ${formatNumber(b*b)} − ${formatNumber(4*a*c)} = ${formatNumber(D)}`;
+            document.getElementById('discriminantCalc').textContent = calc;
+            
+            const resultDiv = document.getElementById('discriminantResult');
+            if (D > 0) {
+                resultDiv.innerHTML = `<span class="text-green-400">D = ${formatNumber(D)} > 0</span> <span class="text-gray-300">-- два различных корня</span>`;
+            } else if (D === 0) {
+                resultDiv.innerHTML = `<span class="text-yellow-400">D = 0</span> <span class="text-gray-300">-- один корень (двукратный)</span>`;
+            } else {
+                resultDiv.innerHTML = `<span class="text-red-400">D = ${formatNumber(D)} < 0</span> <span class="text-gray-300">-- нет действительных корней</span>`;
+            }
+        }
+
+        function calculateRoots(a, b, D) {
+            if (D < 0) return [];
+            if (D === 0) return [-b / (2 * a)];
+            
+            const sqrtD = Math.sqrt(D);
+            const x1 = (-b + sqrtD) / (2 * a);
+            const x2 = (-b - sqrtD) / (2 * a);
+            return [x1, x2].sort((a, b) => b - a);
+        }
+
+        function displayRoots(a, b, D, roots) {
+            const section = document.getElementById('rootsSection');
+            
+            if (D < 0) {
+                section.innerHTML = '<div class="text-red-400 text-lg">Действительных корней нет</div>';
+                return;
+            }
+
+            let html = '';
+            
+            if (D === 0) {
+                const x = roots[0];
+                html += `
+                    <div class="step-card rounded-lg p-4">
+                        <div class="text-gray-300 math-font mb-2">x = −b / (2a)</div>
+                        <div class="text-white math-font">x = ${formatNumber(-b)} / (2·${formatNumber(a)}) = ${formatNumber(x)}</div>
+                    </div>
+                    <div class="text-center text-2xl text-cyan-400 font-bold math-font mt-2">x = ${formatNumber(x)}</div>
+                `;
+            } else {
+                const sqrtD = Math.sqrt(D);
+                html += `
+                    <div class="step-card rounded-lg p-4">
+                        <div class="text-gray-300 math-font mb-2">x = (−b ± √D) / (2a)</div>
+                        <div class="text-white math-font mb-2">x = (${formatNumber(-b)} ± √${formatNumber(D)}) / ${formatNumber(2*a)}</div>
+                        <div class="text-white math-font">x = (${formatNumber(-b)} ± ${formatNumber(sqrtD)}) / ${formatNumber(2*a)}</div>
+                    </div>
+                `;
+                
+                if (roots.length === 2) {
+                    html += `
+                        <div class="grid md:grid-cols-2 gap-4 mt-2">
+                            <div class="text-center p-3 bg-gray-800/30 rounded-lg">
+                                <div class="text-gray-400 text-sm mb-1">x₁</div>
+                                <div class="text-xl text-cyan-400 font-bold math-font">${formatNumber(roots[0])}</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-800/30 rounded-lg">
+                                <div class="text-gray-400 text-sm mb-1">x₂</div>
+                                <div class="text-xl text-cyan-400 font-bold math-font">${formatNumber(roots[1])}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            section.innerHTML = html;
+        }
+
+        function displayFactorization(a, roots) {
+            const div = document.getElementById('factorization');
+            
+            if (roots.length === 0) {
+                div.innerHTML = '<span class="text-red-400">Невозможно разложить на действительные множители (D < 0)</span>';
+                return;
+            }
+
+            // Format a
+            let aStr = '';
+            if (a === 1) aStr = '';
+            else if (a === -1) aStr = '−';
+            else aStr = formatNumber(a);
+
+            if (roots.length === 1) {
+                // Perfect square: a(x - x1)²
+                const x1 = roots[0];
+                const sign = x1 >= 0 ? '−' : '+';
+                const val = formatNumber(Math.abs(x1));
+                
+                if (x1 === 0) {
+                    div.innerHTML = `${aStr}x² = 0`;
+                } else {
+                    div.innerHTML = `${aStr}(x ${sign} ${val})² = 0`;
+                }
+            } else {
+                // Two roots: a(x - x1)(x - x2)
+                const x1 = roots[0];
+                const x2 = roots[1];
+                
+                const sign1 = x1 >= 0 ? '−' : '+';
+                const val1 = formatNumber(Math.abs(x1));
+                
+                const sign2 = x2 >= 0 ? '−' : '+';
+                const val2 = formatNumber(Math.abs(x2));
+                
+                let factor1 = x1 === 0 ? 'x' : `(x ${sign1} ${val1})`;
+                let factor2 = x2 === 0 ? 'x' : `(x ${sign2} ${val2})`;
+                
+                // If both roots are 0
+                if (x1 === 0 && x2 === 0) {
+                    div.innerHTML = `${aStr}x² = 0`;
+                } else {
+                    div.innerHTML = `${aStr}${factor1}·${factor2} = 0`;
+                }
+            }
+        }
+
+        function displayVieta(a, b, c, roots) {
+            const sum = -b / a;
+            const product = c / a;
+            
+            document.getElementById('vieta1').innerHTML = 
+                `${formatNumber(roots[0] || 0)} ${roots[1] !== undefined ? '+ ' + formatNumber(roots[1]) : ''} = ${formatNumber(sum)} ✓`;
+            
+            if (roots.length >= 2) {
+                document.getElementById('vieta2').innerHTML = 
+                    `${formatNumber(roots[0])} · ${formatNumber(roots[1])} = ${formatNumber(product)} ✓`;
+            } else if (roots.length === 1) {
+                document.getElementById('vieta2').innerHTML = 
+                    `${formatNumber(roots[0])}² = ${formatNumber(product)} ✓`;
+            } else {
+                document.getElementById('vieta2').textContent = '--';
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById('results').classList.add('hidden');
+            const errorDiv = document.getElementById('error');
+            errorDiv.classList.remove('hidden');
+            errorDiv.querySelector('div').textContent = msg;
+        }
+
+        function hideError() {
+            document.getElementById('error').classList.add('hidden');
+        }
+
+        // Enter key support
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') solveEquation();
+            });
+        });
+    </script>
+</body>
+</html>
